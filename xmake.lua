@@ -4,6 +4,7 @@ set_project("weasel")
 -- 定义全局变量
 set_xmakever("2.9.4")
 set_languages("c++17")
+set_runtimes("MT")  -- 设置运行时库为静态链接，避免/MD与/MT冲突
 add_defines("UNICODE", "_UNICODE")
 add_defines("WINDOWS")
 add_defines("MSVC")
@@ -96,12 +97,12 @@ rule("use_weaselconstants")
       return false
     end
     if check_include_weasel_constants_in_dir(target:scriptdir()) then
-      target:add("defines", {
-        "VERSION_MAJOR=" .. os.getenv("VERSION_MAJOR"),
-        "VERSION_MINOR=" .. os.getenv("VERSION_MINOR"),
-        "VERSION_PATCH=" .. os.getenv("VERSION_PATCH"),
-        "FILE_VERSION=" .. os.getenv("FILE_VERSION"),
-        "PRODUCT_VERSION=" .. os.getenv("PRODUCT_VERSION")
-    })
+      target:add("rcflags", {
+        "/dVERSION_MAJOR=" .. (os.getenv("VERSION_MAJOR") or "0"),
+        "/dVERSION_MINOR=" .. (os.getenv("VERSION_MINOR") or "0"),
+        "/dVERSION_PATCH=" .. (os.getenv("VERSION_PATCH") or "0"),
+        "/dFILE_VERSION=" .. (os.getenv("FILE_VERSION") or "\"0.0.0.0\""),
+        "/dPRODUCT_VERSION=" .. (os.getenv("PRODUCT_VERSION") or "\"0.0.0.0\"")
+      })
     end
   end)
