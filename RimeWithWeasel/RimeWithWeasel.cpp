@@ -47,6 +47,7 @@ RimeWithWeaselHandler::RimeWithWeaselHandler(UI* ui)
       m_global_ascii_mode(false),
       m_show_notifications_time(1200),
       _UpdateUICallback(NULL) {
+  m_ui->InServer() = true;
   rime_api = rime_get_api();
   assert(rime_api);
   m_pid = GetCurrentProcessId();
@@ -687,10 +688,12 @@ void RimeWithWeaselHandler::_LoadAppInlinePreeditSet(WeaselSessionId ipc_id,
 }
 
 bool RimeWithWeaselHandler::_ShowMessage(Context& ctx, Status& status) {
+  std::lock_guard<std::mutex> lock(m_notifier_mutex);
+  if (m_message_type.empty() || m_message_value.empty())
+    return m_ui->IsCountingDown();
   // show as auxiliary string
   std::wstring& tips(ctx.aux.str);
   bool show_icon = false;
-  std::lock_guard<std::mutex> lock(m_notifier_mutex);
   if (m_message_type == "deploy") {
     if (m_message_value == "start")
       if (GetThreadUILanguage() == MAKELANGID(LANG_ENGLISH, SUBLANG_ENGLISH_US))
@@ -728,8 +731,9 @@ bool RimeWithWeaselHandler::_ShowMessage(Context& ctx, Status& status) {
     if (m_message_value == "full_shape" || m_message_value == "!full_shape")
       status.type = FULL_SHAPE;
   }
-  if (tips.empty() && !show_icon)
-    return m_ui->IsCountingDown();
+  auto counter = m_ui->IsCountingDown();
+  if (!show_icon && counter)
+    return counter;
   auto foption = m_show_notifications.find(m_option_name);
   auto falways = m_show_notifications.find("always");
   if ((!add_session && (foption != m_show_notifications.end() ||
