@@ -116,11 +116,11 @@ jobs:
           copy .\winsparkle\Release\WinSparkle.dll .\output\Win32\
           copy .\winsparkle\Release\WinSparkle.lib .\lib\
 
-      - name: Get zym234555 files
+      - name: Get Rime files
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          .\get-zym234555.ps1 -use dev
+          .\get-rime.ps1 -use dev
 
       - name: Build data
         shell: pwsh
