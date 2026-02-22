@@ -116,11 +116,11 @@ jobs:
           copy .\winsparkle\Release\WinSparkle.dll .\output\Win32\
           copy .\winsparkle\Release\WinSparkle.lib .\lib\
 
-      - name: Get Rime files
+      - name: Get zym234555 files
         shell: pwsh
         run: |
           $ErrorActionPreference = 'Stop'
-          .\get-rime.ps1 -use dev
+          .\get-zym234555.ps1 -use dev
 
       - name: Build data
         shell: pwsh
@@ -136,7 +136,7 @@ jobs:
         shell: pwsh
         id: build_weasel
         env:
-          RELEASE_BUILD: ${{ (github.repository == 'rime/weasel' && startsWith(github.ref, 'refs/tags/')) && '1' || '' }}
+          RELEASE_BUILD: ${{ (github.repository == 'zym234555/weasel' && startsWith(github.ref, 'refs/tags/')) && '1' || '' }}
         run: |
           $ErrorActionPreference = 'Stop'
           if ('${{ matrix.variant }}' -eq 'msbuild') {
@@ -164,12 +164,12 @@ jobs:
 
       # Release-only steps (run on tags or master)
       - name: Extract changelog
-        if: ${{ github.repository == 'rime/weasel' && startsWith(github.ref, 'refs/tags/') && matrix.variant == 'msbuild' }}
+        if: ${{ github.repository == 'zym234555/weasel' && startsWith(github.ref, 'refs/tags/') && matrix.variant == 'msbuild' }}
         shell: pwsh
         run: .\extract_changelog.ps1
 
       - name: Create Nightly release
-        if: ${{ github.repository == 'rime/weasel' && github.ref == 'refs/heads/master' && matrix.variant == 'msbuild' }}
+        if: ${{ github.repository == 'zym234555/weasel' && github.ref == 'refs/heads/master' && matrix.variant == 'msbuild' }}
         uses: 'marvinpinto/action-automatic-releases@latest'
         with:
           repo_token: ${{ secrets.GITHUB_TOKEN }}
@@ -181,7 +181,7 @@ jobs:
             ./output/archives/debug_symbols.7z
 
       - name: Release (stable)
-        if: ${{ github.repository == 'rime/weasel' && startsWith(github.ref, 'refs/tags/') && matrix.variant == 'msbuild' }}
+        if: ${{ github.repository == 'zym234555/weasel' && startsWith(github.ref, 'refs/tags/') && matrix.variant == 'msbuild' }}
         uses: softprops/action-gh-release@v2
         with:
           draft: true
